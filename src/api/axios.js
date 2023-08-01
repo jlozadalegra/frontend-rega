@@ -3,7 +3,7 @@ import { TokenService } from "../services";
 //import { useLocation, Navigate } from "react-router-dom";
 
 const instance = axios.create({
-  baseURL: "http://10.0.1.115:8300",
+  baseURL: "http://localhost:8300",
   headers: {
     "Content-Type": "application/json",
   },
