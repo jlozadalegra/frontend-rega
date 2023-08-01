@@ -49,19 +49,19 @@ function App() {
             <Route path="/users" element={<Users />} />
           </Route>
 
-          <Route element={<RequireAuth allowedRoles={["SI"]} />}>
+          <Route element={<RequireAuth allowedRoles={["admin"]} />}>
             <Route path="/units" element={<Units />} />
           </Route>
 
-          <Route element={<RequireAuth allowedRoles={["SI"]} />}>
+          <Route element={<RequireAuth allowedRoles={["admin"]} />}>
             <Route path="/procdest" element={<ProcDest />} />
           </Route>
 
-          <Route element={<RequireAuth allowedRoles={["SI"]} />}>
+          <Route element={<RequireAuth allowedRoles={["admin"]} />}>
             <Route path="/tipdoc" element={<TipDoc />} />
           </Route>
 
-          <Route element={<RequireAuth allowedRoles={["SI"]} />}>
+          <Route element={<RequireAuth allowedRoles={["admin"]} />}>
             <Route path="/tipsop" element={<TipSop />} />
           </Route>
 

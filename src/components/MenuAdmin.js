@@ -18,11 +18,11 @@ export default function MenuAdmin() {
   const direction = "left";
 
   const menuadmin = [
-    { id: 0, name: "Unidades", path: "/units" },
-    { id: 1, name: "Usuarios", path: "/users" },
-    { id: 2, name: "Procedencia o Destino", path: "/procdest" },
-    { id: 3, name: "Tipo de Documento", path: "/tipdoc" },
-    { id: 4, name: "Tipo de Soporte", path: "/tipsop" },    
+    { id: 0, name: "Unidades o Departamentos", path: "/units" },    
+    { id: 1, name: "Procedencia o Destino", path: "/procdest" },
+    { id: 2, name: "Clasificación de Documentos", path: "/tipdoc" },
+    { id: 3, name: "Tipo de Soporte", path: "/tipsop" },    
+    { id: 4, name: "Usuarios", path: "/users" },
   ];
 
   const navigate = useNavigate();

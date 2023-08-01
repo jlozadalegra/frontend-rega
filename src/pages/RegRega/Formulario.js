@@ -13,41 +13,42 @@ import { AXIOSCONST } from "../../constants";
 import { BackendService } from "../../services";
 
 export function Formulario({ open, onClose, postedit, currentrow }) {
-  const { usuario, CustomMsgError, setMsgSuccess } = useAuthContext();
+  const { usuario, MessageError, MessageSuccess } = useAuthContext();
   const [tipdoc, setTipDoc] = useState([]);
   const [procdest, setProcDest] = useState([]);
   const [tipsop, setTipSop] = useState([]);
 
+  const [archivo, setArchivo] = useState({});
+  const [modifiedFile, setModifiedFile] = useState(false);
+
   const ConfigureModal = useCallback(async () => {
-    let resul = null;
+    //Poblar select Clasificación de Documento
+    const resultCD = await BackendService._get(AXIOSCONST.TIPDOC);
 
-    //Poblar select Tipo Documento de Calidad
-    resul = await BackendService._get(AXIOSCONST.TYPEDOCUM);
-
-    if (resul.statusCode === 200) {
-      setTipDoc(resul.data);
+    if (resultCD.statusCode === 200) {
+      setTipDoc(resultCD.data);
     } else {
-      CustomMsgError(resul);
+      MessageError(resultCD.message);
     }
 
     //Poblar select Procedencia Destino
-    resul = await BackendService._get(AXIOSCONST.PROCDEST);
+    const resultPD = await BackendService._get(AXIOSCONST.PROCDEST);
 
-    if (resul.statusCode === 200) {
-      setProcDest(resul.data);
+    if (resultPD.statusCode === 200) {
+      setProcDest(resultPD.data);
     } else {
-      CustomMsgError(resul);
+      MessageError(resultPD.message);
     }
 
     //Poblar select Tipo de Soporte
-    resul = await BackendService._get(AXIOSCONST.TYPESUPPORT);
+    const resultTS = await BackendService._get(AXIOSCONST.TIPSOP);
 
-    if (resul.statusCode === 200) {
-      setTipSop(resul.data);
+    if (resultTS.statusCode === 200) {
+      setTipSop(resultTS.data);
     } else {
-      CustomMsgError(resul);
+      MessageError(resultTS.message);
     }
-  }, [CustomMsgError]);
+  }, [MessageError]);
 
   //llamar a inincio del modal
   useEffect(() => {
@@ -56,9 +57,46 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
     }
   }, [open, ConfigureModal]);
 
+  //Reiniciar las variables de entorno
+  const reset = () => {
+    setArchivo({});
+    setModifiedFile(false);
+  };
+
+  //Obtener llave de Clasificación
+  const keyTipDoc = async (Co_tdoc) => {
+    const key = await BackendService._get(AXIOSCONST.TIPDOC + "/" + Co_tdoc);
+
+    return key.data.Co_docu;
+  };
+
+  //Obtener consecutivo del REGA
+  const nextCod = async (year) => {
+    const cod = await BackendService._get(
+      AXIOSCONST.CONSECUTIVO + "/" + usuario.idUnidad + "/" + year
+    );
+
+    return cod;
+  };
+
+  //Generar nombre de Archivo
+  const newNameFile = (tipdoc, consec, year) => {
+    return archivo.archivonombre === undefined
+      ? ""
+      : tipdoc +
+          "." +
+          usuario.keyUnidad +
+          "." +
+          consec +
+          "." +
+          String(year).slice(-2) +
+          ".pdf";
+  };
+
   //Guardar nuevo registro
   const newrecord = async (value) => {
-    console.warn("post", value)
+    let responseFile;
+    let responseInsert;
 
     let date = new Date(Date.now());
 
@@ -66,41 +104,98 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
     let month = date.getMonth() + 1;
     let year = date.getFullYear();
 
+    const tipdoc = await keyTipDoc(value.Co_tdoc);
+
+    const consec = await nextCod(year);
+
+    const nameFile = newNameFile(tipdoc, consec, year);
+
     //crea la constante registro con el usuario y la unidad extraidos del context
     const registro = {
       ...value,
+      num_reg: consec,
       fecha: String(year + "-" + month + "-" + day),
       year: String(year),
       repartir: "R",
       Co_nombre: usuario.idUsuario,
       Num_unidad_reg: usuario.idUnidad,
+      file: nameFile,
     };
 
-    const resp = await BackendService._insert(AXIOSCONST.REGA, registro);
+    responseInsert = await BackendService._insert(AXIOSCONST.REGA, registro);
+
+    if (modifiedFile && archivo) {
+      const f = new FormData();
+      f.append("file", archivo.archivo, nameFile); //archivo.archivonombre);
+
+      responseFile = await BackendService._insert(AXIOSCONST.UPLOAD, f);
+    }
 
     onClose(true); //Cierra el modal
 
-    if (resp.statusCode === 200) {
-      setMsgSuccess("Registro guardado satisfactoriamente");
+    if (responseInsert.statusCode === 200) {
+      MessageSuccess("Registro guardado satisfactoriamente");
     } else {
-      CustomMsgError(resp);
+      MessageError(responseInsert.message);
     }
+
+    if (responseFile.statusCode === 200) {
+      setTimeout(function () {
+        MessageSuccess(responseFile.message);
+      }, 500);
+    } else {
+      MessageError(responseFile.message);
+    }
+
+    reset();
   };
 
   //Actualizar nuevo registro
   const updaterecord = async (value) => {
-    const resp = await BackendService._update(
+    let responseFile;
+    let responseUpdate;
+
+    const nameFile =
+      currentrow.Co_tdoc.Co_docu +
+      "." +
+      currentrow.Num_unidad_reg.Num_unidad_reg +
+      "." +
+      currentrow.num_reg +
+      "." +
+      currentrow.year.slice(-2) +
+      ".pdf";
+
+    const registro = { ...value, file: nameFile };
+
+    responseUpdate = await BackendService._update(
       AXIOSCONST.REGA + "/" + currentrow.Co_reg,
-      value
+      registro
     );
+
+    if (modifiedFile && archivo) {
+      let fupdate = new FormData();
+      await fupdate.append("file", archivo.archivo, nameFile); //archivo.archivonombre);
+
+      responseFile = await BackendService._insert(AXIOSCONST.UPLOAD, fupdate);
+    }
 
     onClose(true); //Cierra el modal
 
-    if (resp.statusCode === 200) {
-      setMsgSuccess("Registro actualizado satisfactoriamente");
+    if (responseUpdate.statusCode === 200) {
+      MessageSuccess("Registro actualizado satisfactoriamente");
     } else {
-      CustomMsgError(resp.message);
+      MessageError(responseUpdate.message);
     }
+
+    if (responseFile.statusCode === 200) {
+      setTimeout(function () {
+        MessageSuccess(responseFile.message);
+      }, 500);
+    } else {
+      MessageError(responseFile.message);
+    }
+
+    reset();
   };
 
   return (
@@ -115,7 +210,7 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
         </Box>
         <Formik
           initialValues={{
-            numejemp: postedit === "edit" ? currentrow.numejemp : "",            
+            numejemp: postedit === "edit" ? currentrow.numejemp : "",
             ent_sal: postedit === "edit" ? currentrow.ent_sal : "",
             Co_tdoc: postedit === "edit" ? currentrow.Co_tdoc.id : "",
             Co_pdest: postedit === "edit" ? currentrow.Co_pdest.id : "",
@@ -149,6 +244,14 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
               errors.denomindoc = "Required";
             }
 
+            var extPermitidas = /(.pdf)$/i;
+
+            if (archivo.archivonombre !== undefined) {
+              if (!extPermitidas.exec(archivo.archivonombre)) {
+                errors.upload = "Solo seleccionar archivos PDF";
+              }
+            }
+
             return errors;
           }}
           onSubmit={(values, { setSubmitting }) => {
@@ -161,8 +264,6 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
             //Funcion que permite guardar el nuevo registro
             if (postedit === "post") newrecord(values);
             if (postedit === "edit") updaterecord(values);
-
-            //onClose(false);
           }}
         >
           {({ submitForm, isSubmitting }) => (
@@ -174,13 +275,12 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
                     id="ent_sal"
                     name="ent_sal"
                     labelId="lbles"
-                    label="Entrada/Salidad"
+                    label="Entrada/Salida"
                   >
                     <MenuItem value="R/E">Registro de Entrada</MenuItem>
-                    <MenuItem value="R/S">Registro de Salidad</MenuItem>
+                    <MenuItem value="R/S">Registro de Salida</MenuItem>
                   </Field>
                 </Grid>
-
                 <Grid item xs={4}>
                   <Field
                     component={TextField}
@@ -190,7 +290,6 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
                     label="Número de Ejemplares"
                   />
                 </Grid>
-
                 <Grid item xs={4}>
                   <Field
                     component={Select}
@@ -206,14 +305,13 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
                     ))}
                   </Field>
                 </Grid>
-
                 <Grid item xs={6}>
                   <Field
                     component={Select}
                     id="Co_tdoc"
                     name="Co_tdoc"
                     labelId="lbltd"
-                    label="Tipo de Documento"
+                    label="Clasificación"
                   >
                     {tipdoc.map((elemento) => (
                       <MenuItem value={elemento.id}>
@@ -222,7 +320,6 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
                     ))}
                   </Field>
                 </Grid>
-
                 <Grid item xs={6}>
                   <Field
                     component={Select}
@@ -238,7 +335,6 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
                     ))}
                   </Field>
                 </Grid>
-
                 <Grid item xs={12}>
                   <Field
                     component={TextField}
@@ -246,6 +342,30 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
                     name="denomindoc"
                     type="text"
                     label="Descripción"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Field
+                    component={TextField}
+                    id="upload"
+                    name="upload"
+                    type="file"
+                    variant="standard"
+                    inputProps={{
+                      accept: ".pdf",
+                    }}
+                    sx={{
+                      width: "500px",
+                    }}
+                    onChange={async (e) => {
+                      e.preventDefault();
+                      setModifiedFile(true);
+
+                      await setArchivo({
+                        archivo: e.target.files[0],
+                        archivonombre: e.target.files[0].name,
+                      });
+                    }}
                   />
                 </Grid>
 
@@ -272,6 +392,7 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
                       variant="contained"
                       color="primary"
                       onClick={() => {
+                        reset();
                         onClose(false);
                       }}
                     >

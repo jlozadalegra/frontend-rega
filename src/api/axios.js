@@ -3,7 +3,7 @@ import { TokenService } from "../services";
 //import { useLocation, Navigate } from "react-router-dom";
 
 const instance = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: "http://10.0.1.115:8300",
   headers: {
     "Content-Type": "application/json",
   },
@@ -17,7 +17,7 @@ instance.interceptors.request.use(
       request.headers["Authorization"] = "Bearer " + token;
       request.headers["Content-Type"] = "application/json";
     }
-    console.log("Request AXIOS", request);
+    console.info("Request AXIOS", request);
     return request;
   },
   (error) => {
@@ -27,14 +27,15 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => {
-    console.info("Response AXIOS", response);
+    console.info("Response AXIOS", response);    
     return response;
   },
   async (error) => {
     console.error("Error AXIOS response", error);
 
-    if (error.response.status === 401){
+    if (error.response.status === 401){      
       TokenService.RemoveUser();
+      window.location.replace('/login');
     }
  
     /*
@@ -59,7 +60,7 @@ instance.interceptors.response.use(
       }
     }
 */
-    return Promise.reject(error.message);
+    return Promise.reject(error);
   }
 );
 

@@ -12,7 +12,7 @@ import { AXIOSCONST } from "../../constants";
 import { BackendService } from "../../services";
 
 function Units() {
-  const { CustomMsgError, setMsgSuccess } = useAuthContext();
+  const { MessageSuccess, MessageError } = useAuthContext();
 
   const [dataTable, setDataTable] = useState([]);
   const [cargando, setCargando] = useState(false);
@@ -36,9 +36,9 @@ function Units() {
     //Poner mensaje de error de producirce
     if (result.statusCode === 200) {
       await setDataTable(result.data);
-      CustomMsgError(null);
+      
     } else {
-      CustomMsgError(result);
+      MessageError(result.message);
     }
 
     setTimeout(() => {
@@ -56,20 +56,19 @@ function Units() {
   const handleClickDelete = async (row) => {
     messageAlert().then(async (result) => {
       if (result.isConfirmed) {
-        setMsgSuccess(null);
-        CustomMsgError(null);
+        
 
-        const resp = await BackendService._delete(
+        const result = await BackendService._delete(
           AXIOSCONST.UNITS + "/" + row.original.id
         );
 
-        if (resp.statusCode === 200) {
+        if (result.statusCode === 200) {
           dataTable.splice(row.index, 1);
           setDataTable([...dataTable]);
 
-          setMsgSuccess("Registro eliminado satisfactoriamente");
+          MessageSuccess("Registro eliminado satisfactoriamente");
         } else {
-          CustomMsgError(resp);
+          MessageError(result.message);
         }
       }
     });
@@ -86,7 +85,7 @@ function Units() {
       />
 
       <Typography variant="h4" color="initial" sx={{ ml: 2 }}>
-        Unidades
+        Unidades o Departamentos
       </Typography>
 
       <CustomTable

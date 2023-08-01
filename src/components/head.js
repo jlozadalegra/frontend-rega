@@ -12,7 +12,7 @@ import {
   Link,
   Menu,
   MenuItem,
-  Divider
+  Divider,
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
@@ -90,7 +90,15 @@ export default function Head() {
                     </Link>
                   </Box>
 
-                  <Box className="boxlink">
+                  <Box
+                    className="boxlink"
+                    display={
+                      usuario.admin === "SI" ||
+                      usuario.usuario === "Administrador"
+                        ? "block"
+                        : "none"
+                    }
+                  >
                     <MenuAdmin />
                   </Box>
                 </Typography>

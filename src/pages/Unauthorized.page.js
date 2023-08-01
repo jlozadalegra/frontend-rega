@@ -7,7 +7,7 @@ function Unauthorized() {
         No Autorizado
       </Typography>
       <br />
-      <p>No tiene autorización para consultar esta páguina.</p>
+      <p>No tiene autorización para consultar esta página.</p>
     </section>
   );
 }

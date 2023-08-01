@@ -36,7 +36,7 @@ export default function CustomTable({
           muiTableHeadCellProps: {
             align: "center",
           },
-          size: 80,
+          size: 10,
         },
       }}
       columns={columnas}
@@ -49,7 +49,7 @@ export default function CustomTable({
         row.original.Co_nombre &&
         (row.original.Co_nombre.id !== usuario.idUsuario &&
           usuario.admin === "NO") ? null : (
-          <Box sx={{ display: "flex", gap: "1rem" }}>
+          <Box width='1px' sx={{ display: "flex", gap: "1rem" }}>
             <Tooltip arrow placement="left" title="Actualizar">
               <IconButton
                 color="success"

@@ -10,7 +10,8 @@ const style = {
   flexGrow: 1,
   p: 4,
   input: {
-    height: "5px",    
+    height: "30px",    
+    fontSize: "18px" 
   },
   ".MuiTextField-root": {},
   ".MuiFormControl-root": {    

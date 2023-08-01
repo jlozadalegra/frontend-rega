@@ -1,5 +1,11 @@
 const columnas = [ 
   {
+    accessorKey: "identificador",
+    header: "Nombre de Usuario",
+    size: 20,
+    footer: "Nombre de Usuario",
+  }, 
+  {
     accessorKey: "datosgenerales",
     header: "Nombre Completo",
     size: 20,

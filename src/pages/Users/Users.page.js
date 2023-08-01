@@ -12,7 +12,11 @@ import { AXIOSCONST } from "../../constants";
 import { BackendService } from "../../services";
 
 function Users() {
-  const { usuario, CustomMsgError, setMsgSuccess } = useAuthContext();
+  const {
+    usuario,    
+    MessageSuccess,
+    MessageError,
+  } = useAuthContext();
 
   const [dataTable, setDataTable] = useState([]);
   const [cargando, setCargando] = useState(false);
@@ -27,20 +31,25 @@ function Users() {
     setOpen(false);
   };
 
-  //Obtener Unidades-------------------------------------------
+  //Obtener Unidades o Departamentos-------------------------------------------
   const ObtenerUsuarios = async () => {
     setCargando(true);
 
-    const result = await BackendService._get(
-      AXIOSCONST.USERSBYUNIT + "/" + usuario.idUnidad
-    );
+    let result = "";
+
+    if (usuario.usuario === "Administrador") {
+      result = await BackendService._get(AXIOSCONST.USERS);
+    } else {
+      result = await BackendService._get(
+        AXIOSCONST.USERSBYUNIT + "/" + usuario.idUnidad
+      );
+    }
 
     //Poner mensaje de error de producirce
     if (result.statusCode === 200) {
-      await setDataTable(result.data);
-      CustomMsgError(null);
+      await setDataTable(result.data);      
     } else {
-      CustomMsgError(result);
+      MessageError(result.message);
     }
 
     setTimeout(() => {
@@ -58,22 +67,20 @@ function Users() {
   const handleClickDelete = async (row) => {
     messageAlert().then(async (result) => {
       if (result.isConfirmed) {
-        setMsgSuccess(null);
-        CustomMsgError(null);
+        const del = { deleted: "SI" };
 
-        const resp = await BackendService._delete(
-          AXIOSCONST.USERS + "/" + row.original.id
+        const result = await BackendService._update(
+          AXIOSCONST.USERS + "/" + row.original.id,
+          del
         );
 
-        console.warn("error al borrar", resp);
-
-        if (resp.statusCode === 200) {
+        if (result.statusCode === 200) {
           dataTable.splice(row.index, 1);
           setDataTable([...dataTable]);
 
-          setMsgSuccess("Registro eliminado satisfactoriamente");
+          MessageSuccess("Registro eliminado satisfactoriamente");
         } else {
-          CustomMsgError(resp);
+          MessageError(result.message);
         }
       }
     });

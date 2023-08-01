@@ -12,7 +12,7 @@ import { AXIOSCONST } from "../../constants";
 import { BackendService } from "../../services";
 
 function TipDoc() {
-  const { CustomMsgError, setMsgSuccess } = useAuthContext();
+  const { MessageError, MessageSuccess } = useAuthContext();
 
   const [dataTable, setDataTable] = useState([]);
   const [cargando, setCargando] = useState(false);
@@ -38,9 +38,9 @@ function TipDoc() {
       //Poner mensaje de error de producirce
       if (result.statusCode === 200) {
         await setDataTable(result.data);
-        CustomMsgError(null);
+        MessageError(null);
       } else {
-        CustomMsgError(result);
+        MessageError(result);
       }
 
       setTimeout(() => {
@@ -54,12 +54,12 @@ function TipDoc() {
 
   //Eliminar un registro--------------------------------------------------------------------------------------
   const handleClickDelete = async (row) => {
-    CustomMsgError(null);
+    MessageError(null);
 
     messageAlert().then(async (result) => {
       if (result.isConfirmed) {
-        setMsgSuccess(null);
-        CustomMsgError(null);
+        MessageSuccess(null);
+        MessageError(null);
 
         const resp = await BackendService._delete(
           AXIOSCONST.TIPDOC + "/" + row.original.id
@@ -69,9 +69,9 @@ function TipDoc() {
           dataTable.splice(row.index, 1);
           setDataTable([...dataTable]);
 
-          setMsgSuccess("Registro eliminado satisfactoriamente");
+          MessageSuccess("Registro eliminado satisfactoriamente");
         } else {          
-          CustomMsgError(resp);
+          MessageError(resp);
         }
       }
     });
@@ -88,7 +88,7 @@ function TipDoc() {
       />
 
       <Typography variant="h4" color="initial" sx={{ ml: 2 }}>
-        Tipos de Documentos de Calidad
+        Clasificación de Documentos
       </Typography>
 
       <CustomTable

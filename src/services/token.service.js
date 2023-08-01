@@ -7,8 +7,7 @@ const GetUser = () => {
   return JSON.parse(localStorage.getItem("user"));
 };
 
-const SetUser = (user) => {  
-  console.log(JSON.stringify(user));
+const SetUser = (user) => {
   localStorage.setItem("user", JSON.stringify(user));
 };
 

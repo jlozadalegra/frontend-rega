@@ -1,82 +1,30 @@
-import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { MenuItem, Typography, Grid, Paper, Button, Box } from "@mui/material";
+import { Typography, Grid, Paper, Button, Box } from "@mui/material";
 import { Formik, Field, Form } from "formik";
-import { Select, TextField } from "formik-mui";
+import { TextField } from "formik-mui";
 
-import { AuthService } from "../services";
+import { AuthService, TokenService } from "../services";
 import { useAuthContext } from "../contexts/auth-context";
 
-import { AXIOSCONST } from "../constants";
-import { BackendService } from "../services";
 
 export default function Login() {
-  const { setUsuario, CustomMsgError } = useAuthContext();
-
-  const [errorMsg, setErrorMsg] = useState("");
-
-  const [unidades, setUnidades] = useState([]);
-  const [usuarios, setUsuarios] = useState([]);
-  const [isUnidad, setIsUnidad] = useState(true);
-  const [isUsuario, setIsUsuario] = useState(true);
+  const { setUsuario, MessageError } = useAuthContext();
 
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
 
-  useEffect(() => {
-    //Cargar undades-------------------------------------------------------
-    const cargarUnidades = async () => {
-      CustomMsgError(null);
-
-      const result = await BackendService._get(AXIOSCONST.UNITS);
-
-      if (result.statusCode === 200) {
-        await setUnidades(result.data);
-      } else {
-        CustomMsgError(result);
-      }
-    };
-
-    cargarUnidades();
-  }, [CustomMsgError]);
-
-  //Si se a seleccionado una unidad cargar los usuarios
-  const handleUnit = async (e) => {
-    CustomMsgError(null);
-
-    const result = await BackendService._get(
-      AXIOSCONST.USERSBYUNIT + "/" + e.target.value
-    );
-
-    if (result.statusCode === 200) {
-      setUsuarios(result.data);
-      setIsUnidad(false);
-    } else {
-      CustomMsgError(result);
-    }
-  };
-
-  const handleUser = async () => {
-    setIsUsuario(false);
-  };
-
   return (
     <Formik
       initialValues={{
-        unidad: "",
         usuario: "",
         password: "",
       }}
       validate={(values) => {
         const errors = {};
 
-        if (!values.unidad) {
-          errors.unidad = "La Unidad es requerida";
-        }
-
-        if (!values.usuario) {
+        if (!values.usuario) {          
           errors.usuario = "El Usuario es requerido";
         }
 
@@ -87,9 +35,7 @@ export default function Login() {
         return errors;
       }}
       onSubmit={(values, { setSubmitting, setFieldError }) => {
-        setSubmitting(false);
-        setErrorMsg(null);
-        CustomMsgError(null);
+        setSubmitting(false);                
 
         const obtenerLogin = async () => {
           const resul = await AuthService.login(
@@ -97,17 +43,24 @@ export default function Login() {
             values.password
           );
 
+          console.info("Resultado", resul);
+
           //Si el usuario y la contraseñas son correctas
           if (resul.statusCode === 200) {
+            TokenService.SetUser(resul.data);
             setUsuario(resul.data);
             navigate(from, { replace: true });
           } else {
-            CustomMsgError(resul);
-          }
+            //si el usuario es incorrecto
+            if (resul.statusCode === 404)
+              setFieldError("usuario", resul.message);
 
-          //si la contraseña es incorrecta
-          if (resul.statusCode === 401)
-            setFieldError("password", resul.message);
+            //si la contraseña es incorrecta
+            if (resul.statusCode === 409)
+              setFieldError("password", resul.message);
+
+            MessageError(resul.message);
+          }
         };
 
         obtenerLogin();
@@ -129,50 +82,29 @@ export default function Login() {
               left: 0,
               display: "flex",
             }}
+            tabIndex={0}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                submitForm();
+              }
+            }}
           >
             <Box sx={{ width: "400px" }}>
               <Paper elevation={12} sx={{ padding: 5 }}>
                 <Grid item sx={{ marginBottom: 2, textAlign: "center" }}>
-                  <Typography variant="body1" color="red">
-                    {errorMsg}
-                  </Typography>
                   <Typography variant="body1" color="initial">
                     Inicio de Sesión
                   </Typography>
                 </Grid>
                 <Grid item sx={{ marginBottom: 2 }}>
                   <Field
-                    component={Select}
-                    id="unidad"
-                    name="unidad"
-                    label="Unidad"
-                    onChange={handleUnit}
-                    sx={{ minWidth: "320px", maxWidth: "320px" }}
-                  >
-                    {unidades.map((elemento) => (
-                      <MenuItem value={elemento.id}>
-                        {elemento.descripcionureg}
-                      </MenuItem>
-                    ))}
-                  </Field>
-                </Grid>
-                <Grid item sx={{ marginBottom: 2 }}>
-                  <Field
-                    component={Select}
+                    component={TextField}
                     id="usuario"
                     name="usuario"
                     label="Usuario"
-                    disabled={isUnidad}
-                    onChange={handleUser}
                     sx={{ minWidth: "320px", maxWidth: "320px" }}
-                  >
-                    {usuarios &&
-                      usuarios.map((elemento) => (
-                        <MenuItem value={elemento.id}>
-                          {elemento.datosgenerales}
-                        </MenuItem>
-                      ))}
-                  </Field>
+                    type="text"
+                  />
                 </Grid>
                 <Grid item sx={{ marginBottom: 2 }}>
                   <Field
@@ -180,7 +112,6 @@ export default function Login() {
                     id="password"
                     name="password"
                     label="Contraseña"
-                    disabled={isUsuario}
                     sx={{ minWidth: "320px" }}
                     type="password"
                   />

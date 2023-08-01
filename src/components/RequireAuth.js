@@ -6,13 +6,18 @@ const RequireAuth = ({ allowedRoles }) => {
   const location = useLocation();
 
   if (usuario) {
-    if (allowedRoles?.includes(usuario.admin)) {
+    if (usuario.usuario === "Administrador") {
       return <Outlet />;
     } else {
-      return <Navigate to="/unauthorized" state={{ from: location }} replace />;
+      if (allowedRoles?.includes(usuario.admin)) {
+        return <Outlet />;
+      } else {
+        return (
+          <Navigate to="/unauthorized" state={{ from: location }} replace />
+        );
+      }
     }
-  } else return <Navigate to="/login" state={{ from: location }} replace />;  
-
- }
+  } else return <Navigate to="/login" state={{ from: location }} replace />;
+};
 
 export default RequireAuth;

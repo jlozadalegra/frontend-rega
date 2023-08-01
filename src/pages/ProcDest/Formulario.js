@@ -12,41 +12,35 @@ import { AXIOSCONST } from "../../constants";
 import { BackendService } from "../../services";
 
 export function Formulario({ open, onClose, postedit, currentrow }) {
-  const { CustomMsgError, setMsgSuccess } = useAuthContext();
+  const { MessageSuccess, MessageError } = useAuthContext();
 
   //Guardar nuevo registro--------------------
   const newrecord = async (value) => {
-    setMsgSuccess(null);
-    CustomMsgError(null);
-
     //Guardar un registro
-    const resp = await BackendService._insert(AXIOSCONST.PROCDEST, value);
+    const result = await BackendService._insert(AXIOSCONST.PROCDEST, value);
 
     onClose(true); //Cierra el modal
 
-    if (resp.statusCode === 200) {
-      setMsgSuccess("Registro guardado satisfactoriamente");
+    if (result.statusCode === 200) {
+      MessageSuccess("Registro guardado satisfactoriamente");
     } else {
-      CustomMsgError(resp);
+      MessageError(result.message);
     }
   };
 
   //Actualizar nuevo registro---------------------
   const updaterecord = async (value) => {
-    setMsgSuccess(null);
-    CustomMsgError(null);
-
-    const resp = await BackendService._update(
+    const result = await BackendService._update(
       AXIOSCONST.PROCDEST + "/" + currentrow.id,
       value
     );
 
     onClose(true); //Cierra el modal
 
-    if (resp.statusCode === 200) {
-      setMsgSuccess("Registro actualizado satisfactoriamente");
+    if (result.statusCode === 200) {
+      MessageSuccess("Registro actualizado satisfactoriamente");
     } else {
-      CustomMsgError(resp.message);
+      MessageError(result.message);
     }
   };
 

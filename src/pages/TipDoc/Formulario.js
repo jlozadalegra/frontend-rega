@@ -12,41 +12,37 @@ import { AXIOSCONST } from "../../constants";
 import { BackendService } from "../../services";
 
 export function Formulario({ open, onClose, postedit, currentrow }) {
-  const { CustomMsgError, setMsgSuccess } = useAuthContext();
+  const { MessageError, MessageSuccess } = useAuthContext();
 
   //Guardar nuevo registro--------------------------------------------------------------------------------------
-  const newrecord = async (value) => {
-    setMsgSuccess(null);
-    CustomMsgError(null);
+  const newrecord = async (value) => {    
 
     //Guardar un registro
-    const resp = await BackendService._insert(AXIOSCONST.TIPDOC, value);
+    const result = await BackendService._insert(AXIOSCONST.TIPDOC, value);
 
     onClose(true); //Cierra el modal
 
-    if (resp.statusCode === 200) {
-      setMsgSuccess("Registro guardado satisfactoriamente");
+    if (result.statusCode === 200) {result
+      MessageSuccess("Registro guardado satisfactoriamente");
     } else {
-      CustomMsgError(resp);
+      MessageError(result.message);
     }
   };
 
   //Actualizar nuevo registro----------------------------------------------------------------------------------
   const updaterecord = async (value) => {
-    setMsgSuccess(null);
-    CustomMsgError(null);
 
-    const resp = await BackendService._update(
+    const result = await BackendService._update(
       AXIOSCONST.TIPDOC + "/" + currentrow.id,
       value
     );
 
     onClose(true); //Cierra el modal
 
-    if (resp.statusCode === 200) {
-      setMsgSuccess("Registro actualizado satisfactoriamente");
+    if (result.statusCode === 200) {
+      MessageSuccess("Registro actualizado satisfactoriamente");
     } else {
-      CustomMsgError(resp.message);
+      MessageError(result.message);
     }
   };
 
@@ -62,11 +58,16 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
         </Box>
         <Formik
           initialValues={{
+            Co_docu: postedit === "edit" ? currentrow.Co_docu : "",
             Desc_docu: postedit === "edit" ? currentrow.Desc_docu : "",
           }}
           validate={(values) => {
             const errors = {};
 
+            if (!values.Co_docu) {
+              errors.Co_docu = "Este campo es obligatorio";
+            }
+            
             if (!values.Desc_docu) {
               errors.Desc_docu = "Este campo es obligatorio";
             }
@@ -84,6 +85,15 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
           {({ submitForm, isSubmitting }) => (
             <Form>
               <Grid container rowSpacing={3} spacing={2}>
+              <Grid item xs={12}>
+                  <Field
+                    component={TextField}
+                    id="Co_docu"
+                    name="Co_docu"
+                    type="text"
+                    label="Alias"
+                  />
+                </Grid>
                 <Grid item xs={12}>
                   <Field
                     component={TextField}

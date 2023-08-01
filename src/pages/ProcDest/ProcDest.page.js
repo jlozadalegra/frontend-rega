@@ -12,7 +12,7 @@ import { AXIOSCONST } from "../../constants";
 import { BackendService } from "../../services";
 
 function ProcDest() {
-  const { CustomMsgError, setMsgSuccess } = useAuthContext();
+  const { MessageSuccess, MessageError } = useAuthContext();
 
   const [dataTable, setDataTable] = useState([]);
   const [cargando, setCargando] = useState(false);
@@ -38,9 +38,8 @@ function ProcDest() {
       //Poner mensaje de error de producirce
       if (result.statusCode === 200) {
         await setDataTable(result.data);
-        CustomMsgError(null);
       } else {
-        CustomMsgError(result);
+        MessageError(result.message);
       }
 
       setTimeout(() => {
@@ -54,24 +53,19 @@ function ProcDest() {
 
   //Eliminar un registro----------------------------
   const handleClickDelete = async (row) => {
-    CustomMsgError(null);
-
     messageAlert().then(async (result) => {
       if (result.isConfirmed) {
-        setMsgSuccess(null);
-        CustomMsgError(null);
-
-        const resp = await BackendService._delete(
+        const result = await BackendService._delete(
           AXIOSCONST.PROCDEST + "/" + row.original.id
         );
 
-        if (resp.statusCode === 200) {
+        if (result.statusCode === 200) {
           dataTable.splice(row.index, 1);
           setDataTable([...dataTable]);
 
-          setMsgSuccess("Registro eliminado satisfactoriamente");
-        } else {          
-          CustomMsgError(resp);
+          MessageSuccess("Registro eliminado satisfactoriamente");
+        } else {
+          MessageError(result.message);
         }
       }
     });

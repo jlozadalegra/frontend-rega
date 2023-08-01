@@ -12,7 +12,7 @@ import { AXIOSCONST } from "../../constants";
 import { BackendService } from "../../services";
 
 function TipSop() {
-  const { CustomMsgError, setMsgSuccess } = useAuthContext();
+  const { MessageError, MessageSuccess } = useAuthContext();
 
   const [dataTable, setDataTable] = useState([]);
   const [cargando, setCargando] = useState(false);
@@ -38,9 +38,9 @@ function TipSop() {
       //Poner mensaje de error de producirce
       if (result.statusCode === 200) {
         await setDataTable(result.data);
-        CustomMsgError(null);
+        MessageError(null);
       } else {
-        CustomMsgError(result);
+        MessageError(result);
       }
 
       setTimeout(() => {
@@ -54,24 +54,19 @@ function TipSop() {
 
   //Eliminar un registro-----------------------------------------------------------------------
   const handleClickDelete = async (row) => {
-    CustomMsgError(null);
-
     messageAlert().then(async (result) => {
       if (result.isConfirmed) {
-        setMsgSuccess(null);
-        CustomMsgError(null);
-
-        const resp = await BackendService._delete(
+        const result1 = await BackendService._delete(
           AXIOSCONST.TIPSOP + "/" + row.original.id
         );
 
-        if (resp.statusCode === 200) {
+        if (result1.statusCode === 200) {
           dataTable.splice(row.index, 1);
           setDataTable([...dataTable]);
 
-          setMsgSuccess("Registro eliminado satisfactoriamente");
-        } else {          
-          CustomMsgError(resp);
+          MessageSuccess("Registro eliminado satisfactoriamente");
+        } else {
+          MessageError(result1.message);
         }
       }
     });
@@ -88,7 +83,7 @@ function TipSop() {
       />
 
       <Typography variant="h4" color="initial" sx={{ ml: 2 }}>
-        Tipo de Soporte de Entra o Salidad
+        Tipo de Soporte de Entra o Salida
       </Typography>
 
       <CustomTable

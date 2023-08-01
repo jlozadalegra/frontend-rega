@@ -1,30 +1,22 @@
 import instance from "../api/axios";
 import { AXIOSCONST } from "../constants/axios.constants";
-import TokenService from "./token.service";
 
-const login = async (userid, password) => {
-  let resp = "";  
-
-  const UserID = parseInt(userid);
+const login = async (usuario, password) => {
+  let resp = "";
 
   try {
     resp = await instance({
       method: "post",
       url: AXIOSCONST.LOGIN,
       data: {
-        usuario: UserID,
+        usuario: usuario,
         password: password,
       },
     })
-      .then((response) => {        
-        if (response.data.data.accessToken) {  
-          console.log("login", response.data.data);
-          TokenService.SetUser(response.data.data);
-        }
+      .then((response) => {
         return response.data;
       })
-      .catch((error) => {        
-        console.error("Error LOGIN", error.response);
+      .catch((error) => {
         return error.response.data;
       });
   } catch (error) {

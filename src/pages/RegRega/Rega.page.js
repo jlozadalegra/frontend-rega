@@ -13,7 +13,7 @@ import { AXIOSCONST } from "../../constants";
 import { BackendService } from "../../services";
 
 const RegRega = () => {
-  const { usuario, CustomMsgError, setMsgSuccess } = useAuthContext();
+  const { usuario, MessageError, MessageSuccess } = useAuthContext();
   const [cargando, setCargando] = useState(false);
   const [dataTable, setDataTable] = useState([]);
 
@@ -27,18 +27,23 @@ const RegRega = () => {
     const populateTable = async () => {
       setCargando(true);
 
-      //Obtener los campos de la Tabla por unidad de usuario legueado
-      const result = await BackendService._get(
-        AXIOSCONST.REGABYUNIT + "/" + usuario.idUnidad
-      );
+      let result = "";
+
+      //Obtener los campos de la Tabla por unidad de usuario logueado
+      if (usuario.usuario === "Administrador") {
+        result = await BackendService._get(AXIOSCONST.REGA);
+      } else {
+        result = await BackendService._get(
+          AXIOSCONST.REGABYUNIT + "/" + usuario.idUnidad
+        );
+      }
 
       //Poblar el la tabla
       if (result.statusCode === 200) {
-        await setDataTable(result.data);
-        CustomMsgError(null);
+        await setDataTable(result.data);        
       } else {
         //Poner mensaje de error de producirce
-        CustomMsgError(result);
+        MessageError(result.message);
       }
 
       setTimeout(() => {
@@ -59,23 +64,19 @@ const RegRega = () => {
 
   //Eliminar un registro----------------------------------------------------------------------
   const handleClickDelete = async (row) => {
-    console.warn("row", row);
     messageAlert().then(async (result) => {
       if (result.isConfirmed) {
-        setMsgSuccess(null);
-        CustomMsgError(null);
-
-        const resp = await BackendService._delete(
+        const result = await BackendService._delete(
           AXIOSCONST.REGA + "/" + row.original.Co_reg
         );
 
-        if (resp.statusCode === 200) {
+        if (result.statusCode === 200) {
           dataTable.splice(row.index, 1);
           setDataTable([...dataTable]);
 
-          setMsgSuccess("Registro eliminado satisfactoriamente");
+          MessageSuccess("Registro eliminado satisfactoriamente");
         } else {
-          CustomMsgError(resp);
+          MessageError(result.message);
         }
       }
     });
