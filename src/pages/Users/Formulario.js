@@ -27,13 +27,11 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
 
       if (result.statusCode === 200) {
         await setUnidades(result.data);
-      } else {
-        MessageError(result.message);
-      }
+      } 
     };
 
     cargarUnidades();
-  }, [MessageError]);
+  }, []);
 
   //Validar identificador---------------------------------------------------------------------
   const validateuser = async (usuario) => {

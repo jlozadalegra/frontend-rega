@@ -35,11 +35,8 @@ function Units() {
 
     //Poner mensaje de error de producirce
     if (result.statusCode === 200) {
-      await setDataTable(result.data);
-      
-    } else {
-      MessageError(result.message);
-    }
+      await setDataTable(result.data);      
+    } 
 
     setTimeout(() => {
       setCargando(false);

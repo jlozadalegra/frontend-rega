@@ -37,11 +37,8 @@ function TipSop() {
 
       //Poner mensaje de error de producirce
       if (result.statusCode === 200) {
-        await setDataTable(result.data);
-        MessageError(null);
-      } else {
-        MessageError(result);
-      }
+        await setDataTable(result.data);        
+      } 
 
       setTimeout(() => {
         setCargando(false);
@@ -83,7 +80,7 @@ function TipSop() {
       />
 
       <Typography variant="h4" color="initial" sx={{ ml: 2 }}>
-        Tipo de Soporte de Entra o Salida
+        Tipo de Soporte
       </Typography>
 
       <CustomTable

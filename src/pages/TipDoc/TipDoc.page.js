@@ -37,11 +37,8 @@ function TipDoc() {
 
       //Poner mensaje de error de producirce
       if (result.statusCode === 200) {
-        await setDataTable(result.data);
-        MessageError(null);
-      } else {
-        MessageError(result);
-      }
+        await setDataTable(result.data);        
+      } 
 
       setTimeout(() => {
         setCargando(false);

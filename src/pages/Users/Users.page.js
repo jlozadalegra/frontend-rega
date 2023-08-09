@@ -48,9 +48,7 @@ function Users() {
     //Poner mensaje de error de producirce
     if (result.statusCode === 200) {
       await setDataTable(result.data);      
-    } else {
-      MessageError(result.message);
-    }
+    } 
 
     setTimeout(() => {
       setCargando(false);
@@ -88,7 +86,7 @@ function Users() {
 
   //------------------------------------------------
   return (
-    <>
+    <div>
       <Formulario
         open={open}
         onClose={CloseModal}
@@ -112,7 +110,7 @@ function Users() {
           sorting: [{ desc: false }],
         }}
       />
-    </>
+    </div>
   );
 }
 

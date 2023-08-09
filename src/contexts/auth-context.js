@@ -10,20 +10,7 @@ export function AuthProvider(props) {
   const [msgError, setMsgError] = useState(null);
   const [msgSuccess, setMsgSuccess] = useState(null);
 
-  const { enqueueSnackbar } = useSnackbar();
-
-  const CustomMsgError = (value) => {
-    if (value) {
-      switch (value.statusCode) {
-        case 500: {
-          setMsgError("Error interno del Servidor SQL");
-          break;
-        }
-        default:
-          setMsgError(value.message);
-      }
-    } else setMsgError(null);
-  };
+  const { enqueueSnackbar } = useSnackbar(); 
 
   const MessageSuccess = (message) =>{
     enqueueSnackbar(message, {
@@ -47,8 +34,7 @@ export function AuthProvider(props) {
         msgError,
         setMsgError,
         msgSuccess,
-        setMsgSuccess,
-        CustomMsgError,
+        setMsgSuccess,        
         MessageSuccess,
         MessageError
       }}

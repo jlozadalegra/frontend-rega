@@ -6,7 +6,6 @@ import {
   AppBar,
   Box,
   Toolbar,
-  Typography,
   IconButton,
   Container,
   Link,
@@ -59,7 +58,7 @@ export default function Head() {
                 <MenuIcon />
               </IconButton>
               <Box sx={{ flexGrow: 1, display: "flex" }}>
-                <Typography
+                <Box
                   sx={{
                     mr: 2,
                     display: { xs: "block", sm: "flex", md: "flex" },
@@ -101,7 +100,7 @@ export default function Head() {
                   >
                     <MenuAdmin />
                   </Box>
-                </Typography>
+                </Box>
               </Box>
 
               <Box sx={{ flexGrow: 0, display: "inline-flex" }}>

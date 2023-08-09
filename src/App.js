@@ -12,6 +12,7 @@ import Head from "./components/head";
 
 import { useAuthContext } from "./contexts/auth-context";
 import {
+  Areas,
   Login,
   RegRega,
   Units,
@@ -22,7 +23,6 @@ import {
   TipSop,
   Unauthorized,
 } from "./pages";
-import Message from "./components/Message";
 
 function App() {
   const { usuario } = useAuthContext();
@@ -30,8 +30,6 @@ function App() {
   return (
     <>
       {usuario && <Head />}
-
-      <Message />
 
       <Routes>
         <Route path="/" element={<Layout />}>
@@ -59,6 +57,10 @@ function App() {
 
           <Route element={<RequireAuth allowedRoles={["admin"]} />}>
             <Route path="/tipdoc" element={<TipDoc />} />
+          </Route>
+
+          <Route element={<RequireAuth allowedRoles={["admin"]} />}>
+            <Route path="/areas" element={<Areas />} />
           </Route>
 
           <Route element={<RequireAuth allowedRoles={["admin"]} />}>

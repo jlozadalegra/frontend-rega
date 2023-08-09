@@ -7,8 +7,10 @@ import RegRega from "./RegRega/Rega.page";
 import TipDoc from "./TipDoc/TipDoc.page";
 import TipSop from "./TipSop/TipSop.page";
 import Unauthorized from "./Unauthorized.page";
+import Areas from "./Areas"
 
 export {
+  Areas,
   DashBoard,
   Users,
   Units,

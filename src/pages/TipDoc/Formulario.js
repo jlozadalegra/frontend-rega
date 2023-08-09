@@ -22,7 +22,7 @@ export function Formulario({ open, onClose, postedit, currentrow }) {
 
     onClose(true); //Cierra el modal
 
-    if (result.statusCode === 200) {result
+    if (result.statusCode === 200) {
       MessageSuccess("Registro guardado satisfactoriamente");
     } else {
       MessageError(result.message);
