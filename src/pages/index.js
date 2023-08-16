@@ -8,6 +8,7 @@ import TipDoc from "./TipDoc/TipDoc.page";
 import TipSop from "./TipSop/TipSop.page";
 import Unauthorized from "./Unauthorized.page";
 import Areas from "./Areas"
+import PageNotFound from "./PageNotFound";
 
 export {
   Areas,
@@ -19,5 +20,6 @@ export {
   RegRega,
   TipDoc,
   TipSop,
+  PageNotFound,
   Unauthorized,
 };

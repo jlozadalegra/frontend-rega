@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
+
 import {
   AccountCircle,
   Person,
@@ -27,7 +28,7 @@ import { useAuthContext } from "../contexts/auth-context";
 import TokenService from "../services/token.service";
 import MenuAdmin from "./MenuAdmin";
 
-export default function Head() {
+export default function Heads() {
   const { usuario, setUsuario } = useAuthContext();
 
   const [anchorEl, setAnchorEl] = useState(null);

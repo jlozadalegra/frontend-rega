@@ -1,23 +1,29 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
+
 import "./index.css";
 import App from "./App";
 import { AuthProvider } from "./contexts/auth-context";
 import { SnackbarProvider } from "notistack";
 import reportWebVitals from "./reportWebVitals";
 
+import CssBaseline from "@mui/material/CssBaseline";
+
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <Router>
+  <React.StrictMode>
     <SnackbarProvider maxSnack={3} autoHideDuration={2000}>
       <AuthProvider>
-        <Routes>
-          <Route path="/*" element={<App />} />
-        </Routes>
+        <CssBaseline />
+        <App />
       </AuthProvider>
     </SnackbarProvider>
-  </Router>
+  </React.StrictMode>
 );
 
 reportWebVitals();
